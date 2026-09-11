@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.6.0](https://github.com/JoelKipper/for-desktop/compare/v1.5.3...v1.6.0) (2026-09-11)
+
+
+### Features
+
+* default to Joel's self-hosted instance instead of stoat.chat ([eb43770](https://github.com/JoelKipper/for-desktop/commit/eb437700ff426b2473565e2012a15022f9c3f9f8))
+* enable release-please publish flow on forks ([e0ab2ff](https://github.com/JoelKipper/for-desktop/commit/e0ab2ff6d19f64515cbd93f125046a9bb3c40613))
+
+
+### Bug Fixes
+
+* Ensure that autolaunch is configured ([#294](https://github.com/JoelKipper/for-desktop/issues/294)) ([c1df8a7](https://github.com/JoelKipper/for-desktop/commit/c1df8a7afece95623992e3eaeaa5508437bdda7f))
+* Remove tmpdir env as it's not needed anymore ([#295](https://github.com/JoelKipper/for-desktop/issues/295)) ([68cfeb5](https://github.com/JoelKipper/for-desktop/commit/68cfeb5c8e802fc30c5dc774b617b3371811753d))
+* restrict zip maker to darwin/linux, Windows fails on cross-zip bug ([eccbd97](https://github.com/JoelKipper/for-desktop/commit/eccbd97e58ea5cd63bdbd0691e09936217de5611))
+* secrets context isn't allowed in if: conditions ([821b7df](https://github.com/JoelKipper/for-desktop/commit/821b7dfc1294d0ab65a06600eb43a842dd1e8854))
+
 ## [1.5.3](https://github.com/stoatchat/for-desktop/compare/v1.5.2...v1.5.3) (2026-08-19)
 
 
