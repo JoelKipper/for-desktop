@@ -175,8 +175,11 @@ const config: ForgeConfig = {
   publishers: [
     new PublisherGithub({
       repository: {
-        owner: "stoatchat",
-        name: "for-desktop",
+        // Defaults to stoatchat/for-desktop for local builds; in CI this
+        // resolves to whichever repo (fork or upstream) the run is in, so
+        // forks publish their own releases without editing this file.
+        owner: process.env.GITHUB_REPOSITORY_OWNER ?? "stoatchat",
+        name: process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "for-desktop",
       },
     }),
   ],

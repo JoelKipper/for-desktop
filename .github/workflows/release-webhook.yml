@@ -12,6 +12,8 @@ jobs:
   release-webhook:
     name: Send Release Webhook
     runs-on: ubuntu-latest
+    # Only the upstream project has this webhook secret configured.
+    if: ${{ secrets.STOAT_WEBHOOK_UPDATES_URL != '' }}
 
     steps:
       - name: Send release notification webhook
