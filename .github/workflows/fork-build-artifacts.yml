@@ -1,0 +1,65 @@
+name: Build Desktop Artifacts (Fork)
+
+# Builds installable macOS and Windows artifacts for this fork and uploads
+# them as downloadable workflow artifacts. Unlike multiplatform_build.yml
+# (an upstream CI sanity check that only runs `pnpm package`), this runs
+# `pnpm make` and keeps the resulting installers/zips.
+#
+# Trigger manually from the Actions tab, or it runs automatically on push
+# to main.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - ".github/**"
+      - "!.github/workflows/fork-build-artifacts.yml"
+      - ".vscode/**"
+      - ".gitignore"
+      - "README.md"
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Checkout assets
+        run: git -c submodule."assets".update=checkout submodule update --init assets
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Make distributables
+        run: pnpm run make
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stoat-desktop-${{ matrix.os }}
+          path: out/make/**/*
+          if-no-files-found: error
+          retention-days: 14
