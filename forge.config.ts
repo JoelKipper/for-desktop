@@ -37,7 +37,10 @@ const makers: ForgeConfig["makers"] = [
     setupExe: `${STRINGS.execName}-setup.exe`,
     copyright: "Copyright (C) 2025 Revolt Platforms LTD",
   }),
-  new MakerZIP({}),
+  // Restricted to darwin/linux: on win32, cross-zip's cleanup step calls
+  // fs.rmdir(path, { recursive: true }), which newer Node releases reject
+  // (ERR_INVALID_ARG_VALUE). Windows users get the Squirrel installer instead.
+  new MakerZIP({}, ["darwin", "linux"]),
   new MakerFlatpak({
     options: {
       id: "chat.stoat.StoatDesktop",
