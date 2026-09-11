@@ -12,8 +12,6 @@ jobs:
   release-webhook:
     name: Send Release Webhook
     runs-on: ubuntu-latest
-    # Only the upstream project has this webhook secret configured.
-    if: ${{ secrets.STOAT_WEBHOOK_UPDATES_URL != '' }}
 
     steps:
       - name: Send release notification webhook
@@ -22,6 +20,11 @@ jobs:
           REPOSITORY: ${{ github.repository }}
           WEBHOOK_URL: ${{ secrets.STOAT_WEBHOOK_UPDATES_URL }}
         run: |
+          # Only the upstream project has this webhook secret configured.
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "STOAT_WEBHOOK_UPDATES_URL not set, skipping."
+            exit 0
+          fi
           RELEASE_URL="https://github.com/${REPOSITORY}/releases/tag/${TAG_NAME}"
           curl -X POST "$WEBHOOK_URL" \
             -H "Content-Type: application/json" \

@@ -23,9 +23,10 @@ jobs:
       release_version: ${{ steps.rp.outputs.version }}
     steps:
       # Only the upstream repo has this GitHub App configured. Forks fall
-      # back to the default GITHUB_TOKEN below.
+      # back to the default GITHUB_TOKEN below (continue-on-error since
+      # `secrets` can't be referenced in `if:` to skip this conditionally).
       - id: app-token
-        if: ${{ secrets.GH_STOAT_RELEASE_APP_ID != '' }}
+        continue-on-error: true
         uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.GH_STOAT_RELEASE_APP_ID }}
