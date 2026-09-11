@@ -17,6 +17,9 @@ concurrency:
 jobs:
   release-please:
     name: Release Please
+    # Upstream's release flow: needs the stoatchat GitHub App secrets and
+    # publishes to stoatchat/for-desktop, neither of which exist on forks.
+    if: github.repository == 'stoatchat/for-desktop'
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.rp.outputs.release_created }}
