@@ -20,10 +20,13 @@ import { updateTrayMenu } from "./tray";
 export let mainWindow: BrowserWindow;
 
 // currently in-use build
+// Defaults to Joel's self-hosted instance instead of the official
+// stoat.chat, since this fork only ever runs against stoat.joelkipper.com.
+// Still overridable with --force-server=<url> if ever needed.
 export const BUILD_URL = new URL(
   app.commandLine.hasSwitch("force-server")
     ? app.commandLine.getSwitchValue("force-server")
-    : /*MAIN_WINDOW_VITE_DEV_SERVER_URL ??*/ "https://stoat.chat/app",
+    : /*MAIN_WINDOW_VITE_DEV_SERVER_URL ??*/ "https://stoat.joelkipper.com/app",
 );
 
 // internal window state
