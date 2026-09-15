@@ -40,7 +40,6 @@ jobs:
   publish-release:
     name: Publish App
     needs: release-please
-    if: needs.release-please.outputs.release_created == 'true'
     runs-on: ${{ matrix.os }}
 
     permissions:
