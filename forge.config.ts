@@ -181,6 +181,12 @@ const config: ForgeConfig = {
         owner: process.env.GITHUB_REPOSITORY_OWNER ?? "stoatchat",
         name: process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "for-desktop",
       },
+      // Without this, publishing again for a version that already has a
+      // release (the common case here, since this fork doesn't bump the
+      // version on every push) silently skips re-uploading assets that
+      // already exist by that name, so the "release" never actually
+      // updates.
+      overwrite: true,
     }),
   ],
 };
