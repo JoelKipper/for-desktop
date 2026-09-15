@@ -13,6 +13,10 @@ import {
 
 import windowIconAsset from "../../assets/desktop/icon.png?asset";
 
+import {
+  startTrackingActiveWindowForCapture,
+  stopTrackingActiveWindowForCapture,
+} from "./activeWindowTracking";
 import { config } from "./config";
 import { updateTrayMenu } from "./tray";
 
@@ -22,11 +26,17 @@ export let mainWindow: BrowserWindow;
 // currently in-use build
 // Defaults to Joel's self-hosted instance instead of the official
 // stoat.chat, since this fork only ever runs against stoat.joelkipper.com.
-// Still overridable with --force-server=<url> if ever needed.
+//
+// Override precedence (highest first), none of which touch this file:
+//   1. STOAT_DEV_SERVER env var — e.g. for pointing at a local `for-web`
+//      dev server: STOAT_DEV_SERVER=http://localhost:5173 pnpm run start
+//   2. --force-server=<url> command line switch
+//   3. production default (stoat.joelkipper.com)
 export const BUILD_URL = new URL(
-  app.commandLine.hasSwitch("force-server")
-    ? app.commandLine.getSwitchValue("force-server")
-    : /*MAIN_WINDOW_VITE_DEV_SERVER_URL ??*/ "https://stoat.joelkipper.com/app",
+  process.env.STOAT_DEV_SERVER ||
+    (app.commandLine.hasSwitch("force-server")
+      ? app.commandLine.getSwitchValue("force-server")
+      : "https://stoat.joelkipper.com/app"),
 );
 
 // internal window state
@@ -217,10 +227,18 @@ export function createMainWindow() {
           }
           ipcMain.once(
             "screenPickerCallback",
-            (_, idx: number, audio: boolean) => {
+            (_, idx: number, audio: boolean, trackActiveWindow?: boolean) => {
               if (idx < 0 || idx > sources.length) {
                 callback({});
               } else {
+                if (trackActiveWindow) {
+                  startTrackingActiveWindowForCapture((sourceId) => {
+                    mainWindow.webContents.send(
+                      "activeWindowTrackSwitch",
+                      sourceId,
+                    );
+                  });
+                }
                 audio
                   ? callback({
                       video: sources[idx],
@@ -262,6 +280,9 @@ export function createMainWindow() {
     mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize(),
   );
   ipcMain.on("close", () => mainWindow.close());
+  ipcMain.on("stopTrackingActiveWindow", () =>
+    stopTrackingActiveWindowForCapture(),
+  );
 
   // mainWindow.webContents.openDevTools();
 

@@ -30,8 +30,23 @@ contextBridge.exposeInMainWorld("native", {
     ipcRenderer.removeAllListeners(eventName);
     ipcRenderer.once(eventName, (_, sources) => onScreenPick(sources));
   },
-  screenPickerCallback: (idx: number, audio: boolean) =>
-    ipcRenderer.send("screenPickerCallback", idx, audio),
+  screenPickerCallback: (
+    idx: number,
+    audio: boolean,
+    trackActiveWindow?: boolean,
+  ) => ipcRenderer.send("screenPickerCallback", idx, audio, trackActiveWindow),
 
   isWayland: () => ipcRenderer.invoke("getIsWayland"),
+
+  getActiveWindow: () => ipcRenderer.invoke("getActiveWindow"),
+
+  onActiveWindowTrackSwitch: (callback: (sourceId: string) => void) => {
+    const eventName = "activeWindowTrackSwitch";
+    const listener = (_: unknown, sourceId: string) => callback(sourceId);
+    ipcRenderer.on(eventName, listener);
+    return () => {
+      ipcRenderer.removeListener(eventName, listener);
+      ipcRenderer.send("stopTrackingActiveWindow");
+    };
+  },
 });
