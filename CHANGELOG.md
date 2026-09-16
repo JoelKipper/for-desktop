@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/JoelKipper/for-desktop/compare/v1.6.0...v1.6.1) (2026-09-16)
+
+
+### Bug Fixes
+
+* publish GitHub releases directly instead of as drafts ([01a587e](https://github.com/JoelKipper/for-desktop/commit/01a587efd654e478885edc035a30a39d3ce258c6))
+
 ## [1.6.0](https://github.com/JoelKipper/for-desktop/compare/v1.5.3...v1.6.0) (2026-09-11)
 
 
