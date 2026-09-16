@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/JoelKipper/for-desktop/compare/v1.8.0...v1.8.1) (2026-09-16)
+
+
+### Bug Fixes
+
+* bundle get-windows into packaged builds so activity tracking works ([215f9fe](https://github.com/JoelKipper/for-desktop/commit/215f9fe7a3418b029b2bd56cba7362207deaa2a4))
+
 ## [1.8.0](https://github.com/JoelKipper/for-desktop/compare/v1.7.0...v1.8.0) (2026-09-16)
 
 
