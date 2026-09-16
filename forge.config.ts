@@ -135,6 +135,89 @@ const config: ForgeConfig = {
           { recursive: true },
         );
       }
+
+      // `get-windows` is marked `external` in vite.main.config.ts (it's a
+      // native N-API addon, which Vite can't bundle), so Vite's output
+      // just does `import("get-windows")` at runtime expecting to resolve
+      // it from node_modules like a normal package. But Vite-based
+      // electron-forge apps don't copy node_modules into the packaged app
+      // at all (everything is expected to be inlined into the bundle),
+      // so without this, the package is simply missing at runtime on
+      // every platform. Copy the whole thing (incl. its own
+      // node_modules/node-addon-api, which its native loader needs) minus
+      // build scaffolding we don't need at runtime.
+      if (platform === "win32" || platform === "darwin") {
+        fs.cpSync(
+          "node_modules/get-windows",
+          path.join(buildPath, "node_modules/get-windows"),
+          {
+            recursive: true,
+            filter: (src) =>
+              !/[\\/]node_modules[\\/]get-windows[\\/](build|Sources|binding\.gyp)([\\/]|$)/.test(
+                src,
+              ),
+          },
+        );
+      }
+
+      // On Windows, get-windows resolves its native binding through
+      // `@mapbox/node-pre-gyp`, which would drag in ~9 more runtime
+      // dependencies (nopt, npmlog, tar, node-fetch, ...) just to be
+      // copied too. macOS/Linux don't need it at all (they shell out to a
+      // bundled Swift binary / xprop respectively), so patch it out of
+      // the packaged copy on Windows instead: look the prebuilt .node up
+      // directly by platform/arch, skipping node-pre-gyp entirely.
+      if (platform === "win32") {
+        const windowsJsPath = path.join(
+          buildPath,
+          "node_modules/get-windows/lib/windows.js",
+        );
+        fs.writeFileSync(
+          windowsJsPath,
+          `import path from 'node:path';
+import fs from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const getAddon = () => {
+	const require = createRequire(import.meta.url);
+	const bindingRoot = path.join(__dirname, 'binding');
+	let bindingPath;
+	try {
+		const match = fs
+			.readdirSync(bindingRoot)
+			.find((name) => name.includes('-win32-') && name.endsWith('-' + process.arch));
+		if (match) {
+			bindingPath = path.join(bindingRoot, match, 'node-get-windows.node');
+		}
+	} catch {}
+
+	return (bindingPath && fs.existsSync(bindingPath)) ? require(bindingPath) : {
+		getActiveWindow() {},
+		getOpenWindows() {},
+	};
+};
+
+export async function activeWindow() {
+	return getAddon().getActiveWindow();
+}
+
+export function activeWindowSync() {
+	return getAddon().getActiveWindow();
+}
+
+export function openWindows() {
+	return getAddon().getOpenWindows();
+}
+
+export function openWindowsSync() {
+	return getAddon().getOpenWindows();
+}
+`,
+        );
+      }
     },
   },
   plugins: [
