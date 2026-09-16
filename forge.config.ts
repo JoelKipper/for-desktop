@@ -112,7 +112,13 @@ const config: ForgeConfig = {
     //   ...globSync(ASSET_DIR + "/**/*"),
     // ],
   },
-  rebuildConfig: {},
+  // Skip electron-rebuild entirely: the only native modules in this
+  // project (get-windows, node-pipewire) already ship prebuilt binaries
+  // for their target platforms and are wired in manually via the
+  // packageAfterCopy hook below. Rebuilding from source needs a full
+  // node-gyp/Visual-Studio-C++ toolchain, which isn't set up on the
+  // GitHub Actions Windows runner and isn't needed here anyway.
+  rebuildConfig: { onlyModules: [] },
   makers,
   hooks: {
     // Copy the node-pipewire dist to the app on linux
