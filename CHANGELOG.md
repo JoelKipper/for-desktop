@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.2](https://github.com/JoelKipper/for-desktop/compare/v1.8.1...v1.8.2) (2026-09-16)
+
+
+### Bug Fixes
+
+* skip electron-rebuild instead of trying to recompile native deps ([783f1e6](https://github.com/JoelKipper/for-desktop/commit/783f1e601742fc0a99922f7b74ec5d00ff8fb24a))
+
 ## [1.8.1](https://github.com/JoelKipper/for-desktop/compare/v1.8.0...v1.8.1) (2026-09-16)
 
 
