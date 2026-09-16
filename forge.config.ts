@@ -187,6 +187,11 @@ const config: ForgeConfig = {
       // already exist by that name, so the "release" never actually
       // updates.
       overwrite: true,
+      // electron-forge defaults to creating draft releases, which stay
+      // invisible (not "Latest", not in the unauthenticated API, and
+      // useless for the auto-updater) until someone manually publishes
+      // them on GitHub. Publish immediately instead.
+      draft: false,
     }),
   ],
 };
