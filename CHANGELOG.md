@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.4](https://github.com/JoelKipper/for-desktop/compare/v1.8.3...v1.8.4) (2026-09-17)
+
+
+### Bug Fixes
+
+* run prettier on deepLink.ts ([eeaa1a1](https://github.com/JoelKipper/for-desktop/commit/eeaa1a196670512cfa9dd7bd5c53c696fc293425))
+* send Spotify OAuth through the system browser, return via stoat:// deep link ([602ab17](https://github.com/JoelKipper/for-desktop/commit/602ab17ac338ff01a85b99d36f92d18cb1728032))
+
 ## [1.8.2](https://github.com/JoelKipper/for-desktop/compare/v1.8.1...v1.8.2) (2026-09-16)
 
 
