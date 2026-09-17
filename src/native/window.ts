@@ -158,6 +158,19 @@ export function createMainWindow() {
     ) {
       event.preventDefault();
       mainWindow.webContents.reload();
+    } else if (
+      input.control &&
+      input.shift &&
+      input.key.toLowerCase() === "w"
+    ) {
+      // Debug: chrome://webrtc-internals shows the real capturer/encoder
+      // implementation and live send stats per track - useful for
+      // diagnosing screen share issues that don't show up in our own
+      // in-app stats overlay (e.g. which capture backend actually got
+      // used for a given window).
+      event.preventDefault();
+      const debugWindow = new BrowserWindow({ width: 1200, height: 800 });
+      debugWindow.loadURL("chrome://webrtc-internals");
     }
   });
 
