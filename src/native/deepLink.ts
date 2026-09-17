@@ -54,7 +54,10 @@ export function handleDeepLink(rawUrl: string) {
 
   // host covers `stoat://spotify-connected`, pathname covers the
   // (equivalent, but sometimes how it parses) `stoat:/spotify-connected`
-  if (url.hostname === "spotify-connected" || url.pathname === "/spotify-connected") {
+  if (
+    url.hostname === "spotify-connected" ||
+    url.pathname === "/spotify-connected"
+  ) {
     mainWindow?.webContents.send("spotifyConnected");
   }
 }
