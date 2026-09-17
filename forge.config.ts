@@ -103,6 +103,12 @@ const config: ForgeConfig = {
     asar: true,
     name: STRINGS.name,
     executableName: STRINGS.execName,
+    // Registers stoat:// as a URL scheme handled by this app (currently
+    // used to return from Spotify OAuth run in the system browser - see
+    // native/deepLink.ts). Mainly matters on macOS, where this writes
+    // CFBundleURLTypes into Info.plist at package time; Windows/Linux
+    // register it at runtime instead via app.setAsDefaultProtocolClient.
+    protocols: [{ name: STRINGS.name, schemes: ["stoat"] }],
     icon:
       process.platform === "darwin"
         ? `${ASSET_DIR}/icon.icon`

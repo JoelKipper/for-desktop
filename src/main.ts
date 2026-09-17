@@ -6,10 +6,18 @@ import started from "electron-squirrel-startup";
 import "./native/activityStatus";
 import { initAutoLaunch } from "./native/autoLaunch";
 import { config } from "./native/config";
+import {
+  findDeepLinkInArgv,
+  handleDeepLink,
+  registerDeepLinkProtocol,
+} from "./native/deepLink";
 import { initDiscordRpc } from "./native/discordRpc";
 import { initTray } from "./native/tray";
 import { initVirtualMic } from "./native/virtualMic";
 import { BUILD_URL, createMainWindow, mainWindow } from "./native/window";
+
+// must run before "ready" (see registerDeepLinkProtocol's own comment)
+registerDeepLinkProtocol();
 
 // Squirrel-specific logic
 // create/remove shortcuts on Windows when installing / uninstalling
@@ -62,13 +70,30 @@ if (acquiredLock) {
     if (process.platform === "win32") {
       app.setAppUserModelId("chat.stoat.notifications");
     }
+
+    // Windows/Linux: a stoat:// link launching the app for the first time
+    // arrives as a regular argv, not "open-url" (that's macOS only).
+    const initialDeepLink = findDeepLinkInArgv(process.argv);
+    if (initialDeepLink) handleDeepLink(initialDeepLink);
   });
 
   // focus the window if we try to launch again
-  app.on("second-instance", () => {
+  app.on("second-instance", (_event, argv) => {
     mainWindow.show();
     mainWindow.restore();
     mainWindow.focus();
+
+    // Windows/Linux: re-launching via a stoat:// link while already
+    // running surfaces here instead of "open-url".
+    const deepLink = findDeepLinkInArgv(argv);
+    if (deepLink) handleDeepLink(deepLink);
+  });
+
+  // macOS: a stoat:// link, whether the app was already running or this
+  // launched it.
+  app.on("open-url", (event, url) => {
+    event.preventDefault();
+    handleDeepLink(url);
   });
 
   // macOS specific behaviour to keep app active in dock:
@@ -91,10 +116,14 @@ if (acquiredLock) {
 
   // ensure URLs launch in external context
   app.on("web-contents-created", (_, contents) => {
-    // prevent navigation out of build URL origin
+    // prevent navigation out of build URL origin, but hand it to the
+    // system browser instead of just dropping it - needed for flows like
+    // Spotify OAuth (Account.tsx does a same-window redirect through
+    // accounts.spotify.com) which otherwise silently go nowhere in-app.
     contents.on("will-navigate", (event, navigationUrl) => {
       if (new URL(navigationUrl).origin !== BUILD_URL.origin) {
         event.preventDefault();
+        shell.openExternal(navigationUrl);
       }
     });
 

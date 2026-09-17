@@ -49,4 +49,11 @@ contextBridge.exposeInMainWorld("native", {
       ipcRenderer.send("stopTrackingActiveWindow");
     };
   },
+
+  onSpotifyConnected: (callback: () => void) => {
+    const eventName = "spotifyConnected";
+    const listener = () => callback();
+    ipcRenderer.on(eventName, listener);
+    return () => ipcRenderer.removeListener(eventName, listener);
+  },
 });
