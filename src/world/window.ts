@@ -50,6 +50,18 @@ contextBridge.exposeInMainWorld("native", {
     };
   },
 
+  updater: {
+    getStatus: () => ipcRenderer.invoke("updaterGetStatus"),
+    check: () => ipcRenderer.invoke("updaterCheck"),
+    install: () => ipcRenderer.send("updaterInstall"),
+    onStatus: (callback: (status: unknown) => void) => {
+      const eventName = "updaterStatus";
+      const listener = (_: unknown, status: unknown) => callback(status);
+      ipcRenderer.on(eventName, listener);
+      return () => ipcRenderer.removeListener(eventName, listener);
+    },
+  },
+
   onSpotifyConnected: (callback: () => void) => {
     const eventName = "spotifyConnected";
     const listener = () => callback();
