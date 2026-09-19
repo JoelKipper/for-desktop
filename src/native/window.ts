@@ -102,8 +102,17 @@ export function createMainWindow() {
   }
 
   // load the entrypoint
-  mainWindow
-    .loadURL(BUILD_URL.toString())
+  // The web client is a PWA whose service worker precaches the whole app
+  // shell, so after a deploy the desktop app kept serving the previous
+  // build until the worker updated in the background. Wipe the worker, its
+  // caches and the HTTP cache before every load so each start pulls the
+  // current build (the page re-registers a fresh worker afterwards).
+  const webSession = mainWindow.webContents.session;
+  webSession
+    .clearStorageData({ storages: ["serviceworkers", "cachestorage"] })
+    .then(() => webSession.clearCache())
+    .catch(() => undefined)
+    .then(() => mainWindow.loadURL(BUILD_URL.toString()))
     .then(() => mainWindow.webContents.reload());
 
   // minimise window to tray
